@@ -42,19 +42,49 @@ public class DeliveryApp {
         System.out.println("0 — Завершить");
     }
 
-    // реализуйте методы ниже
-
     private static void addParcel() {
-        // Подсказка: спросите тип посылки и необходимые поля, создайте объект и добавьте в allParcels
+        System.out.println("Тип посылки: 1 — стандартная, 2 — хрупкая, 3 — скоропортящаяся");
+        int type = Integer.parseInt(scanner.nextLine());
+
+        System.out.println("Описание:");
+        String description = scanner.nextLine();
+
+        System.out.println("Вес:");
+        int weight = Integer.parseInt(scanner.nextLine());
+
+        System.out.println("Адрес:");
+        String address = scanner.nextLine();
+
+        System.out.println("День отправки:");
+        int sendDay = Integer.parseInt(scanner.nextLine());
+
+        Parcel parcel;
+
+        if (type == 1) {
+            parcel = new StandardParcel(description, weight, address, sendDay);
+        } else if (type == 2) {
+            parcel = new FragileParcel(description, weight, address, sendDay);
+        } else {
+            System.out.println("Срок хранения:");
+            int ttl = Integer.parseInt(scanner.nextLine());
+            parcel = new PerishableParcel(description, weight, address, sendDay, ttl);
+        }
+
+        allParcels.add(parcel);
     }
 
     private static void sendParcels() {
-        // Пройти по allParcels, вызвать packageItem() и deliver()
+        for (Parcel parcel : allParcels) {
+            parcel.packageItem();
+            parcel.deliver();
+        }
     }
 
     private static void calculateCosts() {
-        // Посчитать общую стоимость всех доставок и вывести на экран
+        int total = 0;
+        for (Parcel parcel : allParcels) {
+            total += parcel.calculateDeliveryCost();
+        }
+        System.out.println("Общая стоимость: " + total);
     }
-
 }
-
