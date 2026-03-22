@@ -19,7 +19,7 @@ public class ParcelBox<T extends Parcel> {
         }
 
         if (currentWeight + parcel.getWeight() > maxWeight) {
-            System.out.println("Превышен максимальный вес коробки!");
+            System.out.println("Превышен максимальный вес коробки");
             return;
         }
 

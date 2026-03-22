@@ -8,6 +8,11 @@ public class DeliveryApp {
 
     private static final Scanner scanner = new Scanner(System.in);
     private static List<Parcel> allParcels = new ArrayList<>();
+    private static List<Trackable> trackables = new ArrayList<>();
+
+    private static ParcelBox<StandardParcel> standardBox = new ParcelBox<>(100);
+    private static ParcelBox<FragileParcel> fragileBox = new ParcelBox<>(50);
+    private static ParcelBox<PerishableParcel> perishableBox = new ParcelBox<>(70);
 
     public static void main(String[] args) {
         boolean running = true;
@@ -25,6 +30,12 @@ public class DeliveryApp {
                 case 3:
                     calculateCosts();
                     break;
+                case 4:
+                    trackParcels();
+                    break;
+                case 5:
+                    showBoxContent();
+                    break;
                 case 0:
                     running = false;
                     break;
@@ -35,15 +46,16 @@ public class DeliveryApp {
     }
 
     private static void showMenu() {
-        System.out.println("Выберите действие:");
         System.out.println("1 — Добавить посылку");
         System.out.println("2 — Отправить все посылки");
         System.out.println("3 — Посчитать стоимость доставки");
+        System.out.println("4 — Трекинг посылок");
+        System.out.println("5 — Показать содержимое коробки");
         System.out.println("0 — Завершить");
     }
 
     private static void addParcel() {
-        System.out.println("Тип посылки: 1 — стандартная, 2 — хрупкая, 3 — скоропортящаяся");
+        System.out.println("Тип: 1-Стандарт, 2-Хрупкая, 3-Скоропортящаяся");
         int type = Integer.parseInt(scanner.nextLine());
 
         System.out.println("Описание:");
@@ -56,35 +68,65 @@ public class DeliveryApp {
         String address = scanner.nextLine();
 
         System.out.println("День отправки:");
-        int sendDay = Integer.parseInt(scanner.nextLine());
-
-        Parcel parcel;
+        int day = Integer.parseInt(scanner.nextLine());
 
         if (type == 1) {
-            parcel = new StandardParcel(description, weight, address, sendDay);
+            StandardParcel p = new StandardParcel(description, weight, address, day);
+            allParcels.add(p);
+            standardBox.addParcel(p);
         } else if (type == 2) {
-            parcel = new FragileParcel(description, weight, address, sendDay);
-        } else {
-            System.out.println("Срок хранения:");
+            FragileParcel p = new FragileParcel(description, weight, address, day);
+            allParcels.add(p);
+            fragileBox.addParcel(p);
+            trackables.add(p);
+        } else if (type == 3) {
+            System.out.println("TTL:");
             int ttl = Integer.parseInt(scanner.nextLine());
-            parcel = new PerishableParcel(description, weight, address, sendDay, ttl);
+            PerishableParcel p = new PerishableParcel(description, weight, address, day, ttl);
+            allParcels.add(p);
+            perishableBox.addParcel(p);
         }
-
-        allParcels.add(parcel);
     }
 
     private static void sendParcels() {
-        for (Parcel parcel : allParcels) {
-            parcel.packageItem();
-            parcel.deliver();
+        for (Parcel p : allParcels) {
+            p.packageItem();
+            p.deliver();
         }
     }
 
     private static void calculateCosts() {
-        int total = 0;
-        for (Parcel parcel : allParcels) {
-            total += parcel.calculateDeliveryCost();
+        int sum = 0;
+        for (Parcel p : allParcels) {
+            sum += p.calculateDeliveryCost();
         }
-        System.out.println("Общая стоимость: " + total);
+        System.out.println("Общая стоимость: " + sum);
+    }
+
+    private static void trackParcels() {
+        System.out.println("Введите локацию:");
+        String location = scanner.nextLine();
+        for (Trackable t : trackables) {
+            t.reportStatus(location);
+        }
+    }
+
+    private static void showBoxContent() {
+        System.out.println("1-Стандарт, 2-Хрупкая, 3-Скоропортящаяся");
+        int type = Integer.parseInt(scanner.nextLine());
+
+        if (type == 1) {
+            for (StandardParcel p : standardBox.getAllParcels()) {
+                System.out.println(p.getDescription());
+            }
+        } else if (type == 2) {
+            for (FragileParcel p : fragileBox.getAllParcels()) {
+                System.out.println(p.getDescription());
+            }
+        } else if (type == 3) {
+            for (PerishableParcel p : perishableBox.getAllParcels()) {
+                System.out.println(p.getDescription());
+            }
+        }
     }
 }

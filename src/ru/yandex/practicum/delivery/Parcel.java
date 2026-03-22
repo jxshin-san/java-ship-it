@@ -1,7 +1,6 @@
 package ru.yandex.practicum.delivery;
 
 public abstract class Parcel {
-
     protected String description;
     protected int weight;
     protected String deliveryAddress;
